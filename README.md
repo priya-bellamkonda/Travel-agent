@@ -1,4 +1,4 @@
-# Travel Planner — LangGraph Multi-Agent System
+# Travel Planner - LangGraph Multi-Agent System
 
 An AI-powered travel planning app that fetches live weather and generates personalised packing advice, places to visit, restaurant recommendations, and a full trip summary.
 
@@ -9,21 +9,21 @@ An AI-powered travel planning app that fetches live weather and generates person
 
 ## What It Does
 Enter any city and get:
-- **Live weather** — temperature, humidity, wind speed
-- **Packing advice** — based on current weather conditions
-- **Top 5 places** — must-visit attractions
-- **Top 5 restaurants** — best dining options
-- **Full trip summary** — everything combined
+- **Live weather** - temperature, humidity, wind speed
+- **Packing advice** - based on current weather conditions
+- **Top 5 places** - must-visit attractions
+- **Top 5 restaurants** - best dining options
+- **Full trip summary** - everything combined
 
 
 ## Tech Stack
-- **LangGraph** — multi-agent pipeline
-- **LLM Guard** — prompt injection protection
-- **FastAPI** — REST API backend
-- **OpenAI GPT-4o-mini** — AI responses
-- **OpenWeatherMap API** — live weather data
-- **GCP Cloud Run** — serverless deployment
-- **Docker** — containerisation
+- **LangGraph** - multi-agent pipeline
+- **LLM Guard** - prompt injection protection
+- **FastAPI** - REST API backend
+- **OpenAI GPT-4o-mini** - AI responses
+- **OpenWeatherMap API** - live weather data
+- **GCP Cloud Run** - serverless deployment
+- **Docker** - containerisation
 
 
 ## Architecture
@@ -55,7 +55,7 @@ cd Travel-agent
 pip install -r requirements.txt
 ```
 
-**3. Add API keys — create a .env file**
+**3. Add API keys - create a .env file**
 ```
 OPENAI_API_KEY=sk-proj-...
 OPENWEATHER_API_KEY=your-key
@@ -107,7 +107,7 @@ Travel-agent/
 
 
 ## Security
-- API keys stored in **GCP Secret Manager** — never in code
+- API keys stored in **GCP Secret Manager** - never in code
 - **LLM Guard** ML model detects prompt injection attacks
 - **HMAC signatures** verify state integrity between agents
 - `.env` excluded from GitHub via `.gitignore`
