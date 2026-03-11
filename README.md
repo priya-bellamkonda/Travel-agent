@@ -6,7 +6,6 @@ An AI-powered travel planning app that fetches live weather and generates person
 **App**: https://security-agent-iq5w7vgj4a-uc.a.run.app  
 **API Docs**: https://security-agent-iq5w7vgj4a-uc.a.run.app/docs
 
----
 
 ## What It Does
 Enter any city and get:
@@ -16,7 +15,6 @@ Enter any city and get:
 - **Top 5 restaurants** — best dining options
 - **Full trip summary** — everything combined
 
----
 
 ## Tech Stack
 - **LangGraph** — multi-agent pipeline
@@ -27,7 +25,6 @@ Enter any city and get:
 - **GCP Cloud Run** — serverless deployment
 - **Docker** — containerisation
 
----
 
 ## Architecture
 ```
@@ -44,8 +41,6 @@ The **Security Agent** runs between every agent hop to:
 - Detect prompt injection attacks (LLM Guard + regex)
 - Sanitise all state fields
 - Verify HMAC signatures for tamper detection
-
----
 
 ## Run Locally
 
@@ -76,14 +71,12 @@ uvicorn api:app --reload
 http://localhost:8000
 ```
 
----
 
 ## Deploy to GCP Cloud Run
 ```bash
 bash deploy.sh
 ```
 
----
 
 ## Project Structure
 ```
@@ -112,7 +105,6 @@ Travel-agent/
     └── index.html          ← Frontend UI
 ```
 
----
 
 ## Security
 - API keys stored in **GCP Secret Manager** — never in code
