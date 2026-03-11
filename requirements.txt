@@ -1,0 +1,14 @@
+langchain-core
+langchain-openai
+langgraph
+requests
+python-dotenv
+openai
+
+#API
+fastapi
+uvicorn 
+pydantic
+
+#LLM Guard
+llm-guard

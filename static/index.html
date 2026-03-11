@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Travel Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --ink: #0d0d0d;
+    --paper: #f5f0e8;
+    --sand: #e8dcc8;
+    --rust: #c4622d;
+    --rust-dark: #a04f22;
+    --teal: #2d7a6e;
+    --gold: #c9a84c;
+    --muted: #7a7060;
+    --card: #faf7f2;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--paper); color: var(--ink); min-height: 100vh; overflow-x: hidden; }
+  body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E"); pointer-events: none; z-index: 0; }
+  header { position: relative; padding: 3rem 2rem 2rem; border-bottom: 2px solid var(--ink); display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 1rem; background: var(--ink); color: var(--paper); }
+  .header-left h1 { font-family: 'Playfair Display', serif; font-size: clamp(2.5rem, 6vw, 5rem); font-weight: 900; line-height: 0.95; letter-spacing: -0.02em; }
+  .header-left h1 span { color: var(--gold); }
+  .header-subtitle { font-size: 0.85rem; font-weight: 300; letter-spacing: 0.15em; text-transform: uppercase; color: var(--sand); margin-top: 0.75rem; }
+  .header-badge { background: var(--rust); color: white; font-size: 0.7rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.4rem 0.9rem; border-radius: 2px; align-self: flex-start; margin-top: 0.5rem; }
+  main { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 3rem 2rem 5rem; }
+  .search-section { display: grid; grid-template-columns: 1fr auto; gap: 0; border: 2px solid var(--ink); background: white; margin-bottom: 3rem; box-shadow: 6px 6px 0 var(--ink); }
+  .search-section input { font-family: 'Playfair Display', serif; font-size: 1.5rem; padding: 1.2rem 1.5rem; border: none; outline: none; background: transparent; color: var(--ink); width: 100%; }
+  .search-section input::placeholder { color: var(--muted); font-style: italic; }
+  .search-btn { font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; padding: 0 2rem; background: var(--rust); color: white; border: none; cursor: pointer; transition: background 0.2s; white-space: nowrap; border-left: 2px solid var(--ink); }
+  .search-btn:hover { background: var(--rust-dark); }
+  .search-btn:disabled { background: var(--muted); cursor: not-allowed; }
+  .loading { display: none; text-align: center; padding: 4rem 2rem; }
+  .loading.active { display: block; }
+  .loading-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 2rem; color: var(--muted); }
+  .loading-steps { display: flex; flex-direction: column; gap: 0.75rem; max-width: 360px; margin: 0 auto; }
+  .step { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 1rem; border: 1px solid var(--sand); background: var(--card); font-size: 0.85rem; color: var(--muted); transition: all 0.3s; }
+  .step.active { border-color: var(--rust); color: var(--ink); background: white; }
+  .step.done { border-color: var(--teal); color: var(--teal); }
+  .step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--sand); flex-shrink: 0; transition: background 0.3s; }
+  .step.active .step-dot { background: var(--rust); animation: pulse 1s infinite; }
+  .step.done .step-dot { background: var(--teal); }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  .results { display: none; }
+  .results.active { display: block; }
+  .city-banner { font-family: 'Playfair Display', serif; font-size: clamp(3rem, 8vw, 6rem); font-weight: 900; line-height: 1; letter-spacing: -0.03em; margin-bottom: 0.25rem; }
+  .city-banner span { color: var(--rust); }
+  .result-meta { font-size: 0.8rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--sand); }
+  .security-bar { display: flex; align-items: center; gap: 0.5rem; font-size: 0.72rem; color: var(--teal); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1.5rem; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+  .card { background: var(--card); border: 2px solid var(--ink); padding: 1.75rem; box-shadow: 4px 4px 0 var(--sand); animation: fadeUp 0.5s ease both; }
+  .card:nth-child(2) { animation-delay: 0.1s; }
+  .card:nth-child(3) { animation-delay: 0.2s; }
+  .card:nth-child(4) { animation-delay: 0.3s; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .card-label { font-size: 0.7rem; font-weight: 500; letter-spacing: 0.2em; text-transform: uppercase; color: var(--rust); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+  .card-label::after { content: ''; flex: 1; height: 1px; background: var(--sand); }
+  .card-content { font-size: 0.88rem; line-height: 1.75; color: #2a2520; white-space: pre-wrap; }
+  .card.weather { background: var(--ink); color: var(--paper); box-shadow: 4px 4px 0 var(--rust); }
+  .card.weather .card-label { color: var(--gold); }
+  .card.weather .card-label::after { background: #333; }
+  .card.weather .card-content { color: var(--sand); }
+  .summary-card { background: white; border: 2px solid var(--ink); padding: 2.5rem; box-shadow: 6px 6px 0 var(--teal); margin-top: 0.5rem; animation: fadeUp 0.5s 0.4s ease both; }
+  .summary-card .card-label { color: var(--teal); }
+  .summary-card .card-label::after { background: #d0e8e4; }
+  .error-box { display: none; padding: 1.25rem 1.5rem; border: 2px solid var(--rust); background: #fff5f0; color: var(--rust-dark); font-size: 0.9rem; margin-bottom: 2rem; }
+  .error-box.active { display: block; }
+  footer { text-align: center; padding: 2rem; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); border-top: 1px solid var(--sand); }
+  @media (max-width: 600px) { .search-section { grid-template-columns: 1fr; } .search-btn { padding: 1rem; border-left: none; border-top: 2px solid var(--ink); } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>Travel<br/><span>Planner</span></h1>
+    <p class="header-subtitle">AI-Powered · Weather-Aware · Multi-Agent</p>
+  </div>
+  <div class="header-badge">LLM Guard Active</div>
+</header>
+
+<main>
+  <div class="search-section">
+    <input type="text" id="cityInput" placeholder="Where are you headed?" autocomplete="off"/>
+    <button class="search-btn" id="planBtn" onclick="planTrip()">Plan Trip →</button>
+  </div>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="loading" id="loading">
+    <p class="loading-title">Planning your trip…</p>
+    <div class="loading-steps">
+      <div class="step" id="s1"><div class="step-dot"></div> Fetching live weather</div>
+      <div class="step" id="s2"><div class="step-dot"></div> Security scan & verification</div>
+      <div class="step" id="s3"><div class="step-dot"></div> Building your packing list</div>
+      <div class="step" id="s4"><div class="step-dot"></div> Finding top places to visit</div>
+      <div class="step" id="s5"><div class="step-dot"></div> Recommending restaurants</div>
+      <div class="step" id="s6"><div class="step-dot"></div> Writing your trip summary</div>
+    </div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="city-banner"><span id="cityTitle"></span></div>
+    <div class="result-meta" id="resultMeta"></div>
+    <div class="security-bar" id="securityBar"></div>
+    <div class="cards">
+      <div class="card weather">
+        <div class="card-label">Weather</div>
+        <div class="card-content" id="weatherContent"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Packing List</div>
+        <div class="card-content" id="packingContent"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Places to Visit</div>
+        <div class="card-content" id="placesContent"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Restaurants</div>
+        <div class="card-content" id="restaurantContent"></div>
+      </div>
+    </div>
+    <div class="summary-card">
+      <div class="card-label">Full Trip Summary</div>
+      <div class="card-content" id="summaryContent"></div>
+    </div>
+  </div>
+</main>
+
+<footer>Travel Planner · Secured by LLM Guard · Powered by LangGraph</footer>
+
+<script>
+  const API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://127.0.0.1:8000'
+    : 'https://security-agent-iq5w7vgj4a-uc.a.run.app';
+  
+  let stepTimer;
+
+  document.getElementById('cityInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') planTrip();
+  });
+
+  function setStep(n) {
+    for (let i = 1; i <= 6; i++) {
+      const el = document.getElementById('s' + i);
+      el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+    }
+  }
+
+  function animateSteps() {
+    let s = 1; setStep(s);
+    stepTimer = setInterval(() => { s++; if (s <= 6) setStep(s); }, 4000);
+  }
+
+  async function planTrip() {
+    const city = document.getElementById('cityInput').value.trim();
+    if (!city) return;
+    const btn = document.getElementById('planBtn');
+    const error = document.getElementById('errorBox');
+    const loading = document.getElementById('loading');
+    const results = document.getElementById('results');
+    clearInterval(stepTimer);
+    error.className = 'error-box';
+    results.className = 'results';
+    loading.className = 'loading active';
+    btn.disabled = true;
+    btn.textContent = 'Planning…';
+    animateSteps();
+    try {
+      const res = await fetch(`${API}/plan`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ city })
+      });
+      if (!res.ok) { const err = await res.json(); throw new Error(err.detail || 'Something went wrong'); }
+      const data = await res.json();
+      clearInterval(stepTimer); setStep(7);
+      document.getElementById('cityTitle').textContent = data.city.toUpperCase();
+      document.getElementById('resultMeta').textContent = 'Your personalised travel brief · Generated just now';
+      document.getElementById('weatherContent').textContent = data.weather_report;
+      document.getElementById('packingContent').textContent = data.packing_advice;
+      document.getElementById('placesContent').textContent = data.activity_suggestions;
+      document.getElementById('restaurantContent').textContent = data.restaurant_suggestions;
+      document.getElementById('summaryContent').textContent = data.final_summary;
+      try {
+        const health = await fetch(`${API}/health`);
+        const hdata = await health.json();
+        document.getElementById('securityBar').textContent = 'Protected by ' + hdata.llm_guard;
+      } catch {}
+      loading.className = 'loading';
+      results.className = 'results active';
+      results.scrollIntoView({ behavior: 'smooth' });
+    } catch (err) {
+      clearInterval(stepTimer);
+      loading.className = 'loading';
+      error.textContent = 'error' + err.message;
+      error.className = 'error-box active';
+    }
+    btn.disabled = false;
+    btn.textContent = 'Plan Trip →';
+  }
+</script>
+</body>
+</html>
